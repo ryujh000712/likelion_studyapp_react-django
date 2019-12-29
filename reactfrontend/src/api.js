@@ -11,13 +11,8 @@ export default {
         return axios.post('/posts/', data)
     },
 
-    updatePost(data, id) {
-        return axios.put('/posts/' + String(id), data)
-    },
-
-    async changingLikes(data, id) {
-        let curr_likes = await axios.get('/posts' + String(id), )
-        return axios.put('/posts/', + String(id), {})
+    putLikes(data, id) {
+        return axios.put('/posts/' + String(id) + '/', data)
     },
 
     deletePost(id) {

@@ -19,47 +19,64 @@ import FavoriteBorder from '@material-ui/icons/FavoriteBorder';
 class Post extends React.Component {
   constructor(props) {
     super(props)
-    this.state = { like: false }
+    this.state = {
+      show: true,
+      likes: false,
+      currentLikes: this.props.likes
+    }
   }
 
-  componentDidMount() {
-    this.getLikes()
+  toggleLikes = async () => {
+    await this.setState({likes: !this.state.likes}) 
+    if (this.state.likes) {
+      this.setState({currentLikes: this.state.currentLikes+1}) 
+    } else {
+      this.setState({currentLikes: this.state.currentLikes-1}) 
+    }
+    await api.putLikes({
+              title: this.props.title,
+              content: this.props.content,
+              likes: this.state.currentLikes
+            }, this.props.id)
   }
 
-  getLikes() {
-
-  }
-
-  handlingLikes() {
-     
+  handlingDelete = async (id) => {
+    await api.deletePost(id)
+    this.setState({show: false})
   }
 
   render() {
-    return (
-      <Card className={'card'}>
-        <CardContent>
-          <Typography className={'card-title'} color="textSecondary" gutterBottom>
-            {this.id}번째 대나무
-          </Typography>
-          <Typography variant="h5" component="h2">
-            <PostView
-            key={this.id}
-            title={this.title}
-            content={this.content}
-            />
-          </Typography>
-          <FormControlLabel
-              control={<Checkbox icon={<FavoriteBorder />} checkedIcon={<Favorite />} />}
-              label={this.likes}
-          />
-      </CardContent>
-      <CardActions>
-        <Button value={this.id} onClick={(event) => this.handlingDelete(this.id)} color="secondary" size="small">삭제하기</Button>
-      </CardActions>
-    </Card>
+    if (this.state.show) {
+        return (
+          <Card className={'card'}>
+            <CardContent>
+              <Typography className={'card-title'} color="textSecondary" gutterBottom>
+                {this.props.id}번째 대나무
+              </Typography>
+              <Typography variant="h5" component="h2">
+                <PostView
+                key={this.props.id}
+                title={this.props.title}
+                content={this.props.content}
+                />
+              </Typography>
+              <FormControlLabel
+                  control={<Checkbox icon={<FavoriteBorder />} checkedIcon={<Favorite />} />}
+                  label={this.state.currentLikes}
+                  onChange={this.toggleLikes}
+              />
+          </CardContent>
+          <CardActions>
+            <Button value={this.props.id} onClick={(event) => this.handlingDelete(this.props.id)} color="secondary" size="small">삭제하기</Button>
+          </CardActions>
+        </Card>
 
-    )
-  }
+        )
+       
+    } else {
+      return ([])
+    }
+ }
 }
 
 class App extends React.Component {
@@ -77,11 +94,11 @@ class App extends React.Component {
     this.getPosts()
   }
 
-  async getPosts() {
+  getPosts = async () => {
     const _results = await api.getAllPosts()
     console.log(_results)
     // this.setState({results: _results.data})
-    this.setState({results: _results.data.map((post) => <Post />)})
+    this.setState({results: _results.data})
   }
 
   handlingChange = (event) => {
@@ -151,7 +168,14 @@ class App extends React.Component {
             </Paper>
           </div>
 
-              {this.results}
+          {this.state.results.map((post) =>
+             <Post
+              id={post.id}
+              title={post.title}
+              content={post.content}
+              likes={post.likes}
+            />)}
+                  
         </Container>
       </div>
     )
