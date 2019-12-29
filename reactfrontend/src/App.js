@@ -11,7 +11,56 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import Checkbox from '@material-ui/core/Checkbox';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Favorite from '@material-ui/icons/Favorite';
+import FavoriteBorder from '@material-ui/icons/FavoriteBorder';
 
+class Post extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = { like: false }
+  }
+
+  componentDidMount() {
+    this.getLikes()
+  }
+
+  getLikes() {
+
+  }
+
+  handlingLikes() {
+     
+  }
+
+  render() {
+    return (
+      <Card className={'card'}>
+        <CardContent>
+          <Typography className={'card-title'} color="textSecondary" gutterBottom>
+            {this.id}번째 대나무
+          </Typography>
+          <Typography variant="h5" component="h2">
+            <PostView
+            key={this.id}
+            title={this.title}
+            content={this.content}
+            />
+          </Typography>
+          <FormControlLabel
+              control={<Checkbox icon={<FavoriteBorder />} checkedIcon={<Favorite />} />}
+              label={this.likes}
+          />
+      </CardContent>
+      <CardActions>
+        <Button value={this.id} onClick={(event) => this.handlingDelete(this.id)} color="secondary" size="small">삭제하기</Button>
+      </CardActions>
+    </Card>
+
+    )
+  }
+}
 
 class App extends React.Component {
   constructor(props) {
@@ -23,6 +72,7 @@ class App extends React.Component {
     }
   }
 
+
   componentDidMount() {
     this.getPosts()
   }
@@ -30,7 +80,8 @@ class App extends React.Component {
   async getPosts() {
     const _results = await api.getAllPosts()
     console.log(_results)
-    this.setState({results: _results.data})
+    // this.setState({results: _results.data})
+    this.setState({results: _results.data.map((post) => <Post />)})
   }
 
   handlingChange = (event) => {
@@ -100,30 +151,7 @@ class App extends React.Component {
             </Paper>
           </div>
 
-          <div className="ViewSection">
-            {
-              this.state.results.map(
-                (post) =>
-                <Card className={'card'}>
-                  <CardContent>
-                    <Typography className={'card-title'} color="textSecondary" gutterBottom>
-                      {post.id}번째 대나무
-                    </Typography>
-                    <Typography variant="h5" component="h2">
-                      <PostView
-                      key={post.id}
-                      title={post.title}
-                      content={post.content}
-                      />
-                    </Typography>
-                  </CardContent>
-                  <CardActions>
-                    <Button value={post.id} onClick={(event) => this.handlingDelete(post.id)} color="secondary" size="small">삭제하기</Button>
-                  </CardActions>
-               </Card>
-              )
-            }
-          </div>
+              {this.results}
         </Container>
       </div>
     )

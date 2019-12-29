@@ -15,3 +15,8 @@ body {
 .card {
   margin-bottom: 2rem;
 }
+
+.help {
+  display: inline;
+  font-size: 0.8rem;
+}
